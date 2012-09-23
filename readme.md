@@ -9,7 +9,8 @@ This needs Python 2 and Firefox.
 
 ## Configure
 
-Put your account credentials in `~/.tompkins-trust.json`.
+Put your account credentials in `~/.tompkins-trust.json`; see
+`.tompkins-trust.json.sample` in this repository for the format.
 
 ## Run
 
