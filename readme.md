@@ -1,7 +1,7 @@
 Tompkins Trust History Exporter
 ============
 The  Tompkins Trust History Exporter downloads your Tompkins Trust history in
-OFX format and prints it to stdout.
+OFX format.
 
 ## Dependencies
 
