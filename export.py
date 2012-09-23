@@ -11,11 +11,14 @@ def _driver_setup():
     driver = webdriver.Remote(desired_capabilities=desired_capabilities,command_executor="http://localhost:4444/wd/hub")
     return driver
 
-settings_file = open(os.path.expanduser(os.path.join('~', '.tompkins-trust.json')))
-settings = json.loads(settings_file.read())
-settings_file.close()
+def _settings():
+    settings_file = open(os.path.expanduser(os.path.join('~', '.tompkins-trust.json')))
+    settings = json.loads(settings_file.read())
+    settings_file.close()
+    return settings
 
 d = _driver_setup()
+settings = _settings()
 
 # Username
 d.get('https://www.tompkinstrust.com/accountlogin6x.html')
@@ -28,30 +31,32 @@ d.find_element_by_xpath('//input[@type="image"]').click()
 if settings['login-phrase'] not in d.page_source:
     raise AssertionError('Your login phrase is not shown on the page.')
 
-#input_data = d.find_elements_by_css_selector('td.input_data')
-#if input_data[0].text != settings['username']:
-#    params = (input_data[0].text, settings['username'])
-#    raise AssertionError('Page shows username as "%s" instead of "%s".' % params)
-#if input_data[2].text != u'*':
-#    params = (input_data[2].text, u'*')
-#    raise AssertionError('Page shows star as "%s" instead of "%s".' % params)
-#
-#if input_data[3].text != u'':
-#    params = (input_data[3].text, u'u')
-#    raise AssertionError('Page shows answer as "%s" instead of nothing ("%s").' % params)
-
-# Handle question
-#question = input_data[1].text
-#if not question in settings:
-#    raise ValueError('Please add a value for questions["%s"] in ~/tompkins-trust.json' % question)
-
 # Let the page load.
 sleep(2)
 
-# Impute
-#d.find_element_by_css_selector('input[type="checkbox"]').click()
-#d.find_element_by_css_selector('input[type="text"]').send_keys(settings['questions'][question]) 
+# Impute password
 d.find_element_by_id('login_form:password').send_keys(settings['password'])
 
-# Submit
+# Log in
 d.find_element_by_id('login_form:login').click() 
+
+# Click on "Export History
+d.find_element_by_partial_link_text('Export History').click()
+
+# OFX format
+d.find_element_by_xpath('//input[@name="export_history:export_format"][@value="2"]').click()
+
+# Dates: Today and one fortnight ago
+def enter_date(input_id, thedate):
+    date_element = d.find_element_by_id(input_id)
+    date_element.clear()
+    date_element.send_keys(thedate.strftime('%m/%d/%Y'))
+
+today = datetime.date.today()
+enter_date('export_history:startDate', today - datetime.timedelta(days=14))
+enter_date('export_history:endDate', today)
+
+# Go
+d.find_element_by_id('export_history:submit_history').click()
+sleep(2)
+d.find_element_by_id('export_history_instructions:submit_button').click()
