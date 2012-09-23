@@ -1,5 +1,6 @@
 #!/usr/bin/env python2
 import os
+import datetime
 import json
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
