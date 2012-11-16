@@ -29,6 +29,14 @@ d.find_element_by_id('username').send_keys(settings['username'])
 d.find_element_by_xpath('//input[@type="image"]').click()
 
 # Checks
+
+if 'Challenge question:' in d.page_source:
+    challenge_question = d.find_element_by_xpath('//tr[td[label[text()="Challenge question:"]]]/td[@class="input_data"]').text
+    challenge_answer_box = d.find_element_by_id("login_form:answer")
+    challenge_answer_box.send_keys(settings['challenge-questions'][challenge_question])
+    d.find_element_by_id('login_form:submit_button').click()
+    sleep(3)
+
 if settings['login-phrase'] not in d.page_source:
     raise AssertionError('Your login phrase is not shown on the page.')
 
@@ -39,7 +47,7 @@ sleep(2)
 d.find_element_by_id('login_form:password').send_keys(settings['password'])
 
 # Log in
-d.find_element_by_id('login_form:login').click() 
+d.find_element_by_id('login_form:login').click()
 
 # Click on "Export History
 d.find_element_by_partial_link_text('Export History').click()
